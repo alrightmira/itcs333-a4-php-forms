@@ -1,33 +1,91 @@
 <?php
 declare(strict_types=1);
-
-/**
- * ITCS333 A4 starter — contact form.
- * Requirements (see README rubric):
- *   - GET: render the form
- *   - POST: validate name (required, 2-60 chars), email (valid), message (required, 10-1000 chars)
- *   - invalid POST: re-render with inline errors + repopulated fields (200)
- *   - valid POST: redirect (302/303) to a success page (PRG)
- *   - escape all output with htmlspecialchars
- */
+error_reporting(E_ALL);
 
 require_once __DIR__ . '/../src/validate.php';
 
-// TODO: implement the form handling here.
+function e(string $s): string
+{
+    return htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
+}
+
+function post_str(string $key): string
+{
+    $v = $_POST[$key] ?? '';
+    return is_string($v) ? $v : '';
+}
+
+$errors = [];
+$values = ['name' => '', 'email' => '', 'message' => ''];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $values['name']    = trim(post_str('name'));
+    $values['email']   = trim(post_str('email'));
+    $values['message'] = trim(post_str('message'));
+
+    // Name
+    if (!validate_required($values['name'])) {
+        $errors['name'] = 'Name is required.';
+    } elseif (!validate_length($values['name'], 2, 60)) {
+        $errors['name'] = 'Name is invalid: it must be 2 to 60 characters.';
+    }
+
+    // Email
+    if (!validate_required($values['email'])) {
+        $errors['email'] = 'Email is required.';
+    } elseif (!validate_email($values['email'])) {
+        $errors['email'] = 'Email is invalid.';
+    }
+
+    // Message
+    if (!validate_required($values['message'])) {
+        $errors['message'] = 'Message is required.';
+    } elseif (!validate_length($values['message'], 10, 1000)) {
+        $errors['message'] = 'Message is too short or too long: use 10 to 1000 characters.';
+    }
+
+    
+    if (!$errors) {
+        header('Location: success.php', true, 303);
+        exit;
+    }
+   
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Contact Us</title>
+  <style>.error { color: #b00020; display: block; }</style>
 </head>
 <body>
   <h1>Contact Us</h1>
-  <!-- TODO: render the form, inline errors, and repopulated values -->
   <form method="post" action="index.php">
-    <label>Name <input type="text" name="name"></label><br>
-    <label>Email <input type="email" name="email"></label><br>
-    <label>Message <textarea name="message"></textarea></label><br>
+    <p>
+      <label>Name
+        <input type="text" name="name" value="<?= e($values['name']) ?>">
+      </label>
+      <?php if (isset($errors['name'])): ?>
+        <span class="error"><?= e($errors['name']) ?></span>
+      <?php endif; ?>
+    </p>
+    <p>
+      <label>Email
+        <input type="email" name="email" value="<?= e($values['email']) ?>">
+      </label>
+      <?php if (isset($errors['email'])): ?>
+        <span class="error"><?= e($errors['email']) ?></span>
+      <?php endif; ?>
+    </p>
+    <p>
+      <label>Message
+        <textarea name="message"><?= e($values['message']) ?></textarea>
+      </label>
+      <?php if (isset($errors['message'])): ?>
+        <span class="error"><?= e($errors['message']) ?></span>
+      <?php endif; ?>
+    </p>
     <button type="submit">Send</button>
   </form>
 </body>
