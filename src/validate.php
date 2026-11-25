@@ -18,6 +18,6 @@ function validate_email(string $v): bool
 function validate_length(string $v, int $min, int $max): bool
 {
 
-    $len = mb_strlen($v);
+    $len = mb_strlen($v, 'UTF-8');
     return $len >= $min && $len <= $max;
 }
