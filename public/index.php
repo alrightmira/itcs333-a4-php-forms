@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <textarea name="message"><?php echo e($values['message']) ?></textarea>
       </label>
       <?php if (isset($errors['message'])) { ?>
-        <span class="error"><?php echo ($errors['message']) ?></span>
+        <span class="error"><?php echo e($errors['message']) ?></span>
       <?php }//end if ?>
     </p>
 
