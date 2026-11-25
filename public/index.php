@@ -11,7 +11,7 @@ function e(string $s): string
 
 function post_str(string $key): string
 {
-  if(isset($_POST[$Key]) && is_string($_POST[$Key])) return $_POST[$Key] ; //end if
+  if(isset($_POST[$Key]) && is_string($_POST[$Key])) {return $_POST[$Key] ;} //end if
 
   return " ";
 }
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <form method="post" action="index.php">
     <p>
       <label>Name
-        <input type="text" name="name" value="<?= e($values['name']) ?>">
+        <input type="text" name="name" value="<?php echo e($values['name']) ?>">
       </label>
       <?php if (isset($errors['name'])) {
          ?>
